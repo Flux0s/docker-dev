@@ -1,21 +1,18 @@
-version: '3'
-
 services:
   flask-app:
-    build: .
+    build:
+      context: .
+      target: ${APP_ENV:-production}
     ports:
       - "5000:5000"
     volumes:
-      # In development mode, mount volumes for hot reloading
-      - .:/app:${FLASK_MOUNT:-ro}
-      - ./templates:/app/templates:${FLASK_MOUNT:-ro}
+      # Single volume mount for the entire project
+      - .:/app:ro
     environment:
       - FLASK_APP=app.py
-      - FLASK_ENV=${FLASK_ENV:-development}
-      - FLASK_DEBUG=${FLASK_DEBUG:-1}
+      - APP_ENV=${APP_ENV:-production}
       - PYTHONUNBUFFERED=1
-    restart: ${RESTART_POLICY:-no}
-    # Command is overridden by entrypoint.sh
+    restart: on-failure
     # Add healthcheck
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]

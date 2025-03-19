@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.11-slim AS base
 
 WORKDIR /app
 
@@ -6,12 +6,9 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Set environment variables
+# Set common environment variables
 ENV PYTHONUNBUFFERED=1
 ENV FLASK_APP=app.py
-# Default to development, can be overridden at runtime
-ENV FLASK_ENV=development
-ENV FLASK_DEBUG=1
 
 # Copy application code
 COPY . .
@@ -19,8 +16,12 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 5000
 
-# Use an entrypoint script to determine how to run the app
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Development stage
+FROM base AS development
+ENV APP_ENV=development
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000", "--debug", "--reload"]
 
-ENTRYPOINT ["/entrypoint.sh"]
+# Production stage
+FROM base AS production
+ENV APP_ENV=production
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app", "--workers", "4", "--access-logfile", "-"]

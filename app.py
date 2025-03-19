@@ -3,8 +3,8 @@ import os
 
 app = Flask(__name__)
 
-# Only enable debug mode and auto-reloading in development
-if os.environ.get('FLASK_ENV') == 'development':
+# Configure app based on environment
+if os.environ.get('APP_ENV') == 'development':
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable caching for static files
     app.debug = True

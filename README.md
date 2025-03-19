@@ -23,7 +23,7 @@ docker-dev/
 
 ### Environment Setup
 
-The application can run in either development or production mode using the same Docker configuration with different environment variables.
+The application can run in either development or production mode using a single environment variable `APP_ENV` which selects the appropriate target in our multi-stage Dockerfile.
 
 1. Copy the example environment file:
 
@@ -31,22 +31,22 @@ The application can run in either development or production mode using the same 
 cp .env.example .env
 ```
 
-2. Edit the `.env` file to set your desired environment variables.
+2. Edit the `.env` file to set your desired environment.
 
 ### Running the Application
 
-#### Development Mode (Default)
+#### Production Mode (Default)
 
 ```bash
-# Start in development mode (default)
-docker-compose up --build
+# Start in production mode (default)
+docker-compose up --build -d
 ```
 
-#### Production Mode
+#### Development Mode
 
 ```bash
-# Start in production mode
-FLASK_ENV=production FLASK_DEBUG=0 FLASK_MOUNT=ro RESTART_POLICY=always docker-compose up --build -d
+# Start in development mode
+APP_ENV=development docker-compose up --build
 ```
 
 ### Stopping the Application
@@ -63,11 +63,11 @@ The application code is mounted as a volume in the Docker container when running
 
 | Feature | Development | Production |
 |---------|-------------|------------|
+| Docker Stage | development | production |
 | Web Server | Flask Development Server | Gunicorn |
 | Debug Mode | Enabled | Disabled |
 | Hot Reloading | Enabled | Disabled |
-| Volume Mounts | Read-Write | Read-Only |
-| Container Restart | No | Always |
+| Container Restart | On-failure | On-failure |
 
 ## API Endpoints
 
