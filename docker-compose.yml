@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  flask-app:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    # Use this command to enable hot-reloading during development
+    command: python app.py
