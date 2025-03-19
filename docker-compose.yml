@@ -6,11 +6,20 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - .:/app
-      - ./templates:/app/templates
+      # In development mode, mount volumes for hot reloading
+      - .:/app:${FLASK_MOUNT:-ro}
+      - ./templates:/app/templates:${FLASK_MOUNT:-ro}
     environment:
-      - FLASK_ENV=development
-      - FLASK_DEBUG=1
+      - FLASK_APP=app.py
+      - FLASK_ENV=${FLASK_ENV:-development}
+      - FLASK_DEBUG=${FLASK_DEBUG:-1}
       - PYTHONUNBUFFERED=1
-    # Use this command to enable hot-reloading during development
-    command: python -m flask run --host=0.0.0.0 --port=5000 --reload
+    restart: ${RESTART_POLICY:-no}
+    # Command is overridden by entrypoint.sh
+    # Add healthcheck
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s

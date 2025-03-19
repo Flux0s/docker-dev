@@ -21,23 +21,35 @@ docker-dev/
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
-### Running the Application
+### Environment Setup
 
-1. Build and start the containers:
+The application can run in either development or production mode using the same Docker configuration with different environment variables.
+
+1. Copy the example environment file:
 
 ```bash
+cp .env.example .env
+```
+
+2. Edit the `.env` file to set your desired environment variables.
+
+### Running the Application
+
+#### Development Mode (Default)
+
+```bash
+# Start in development mode (default)
 docker-compose up --build
 ```
 
-2. Access the application at [http://localhost:5000](http://localhost:5000)
-
-3. To run in detached mode:
+#### Production Mode
 
 ```bash
-docker-compose up -d
+# Start in production mode
+FLASK_ENV=production FLASK_DEBUG=0 FLASK_MOUNT=ro RESTART_POLICY=always docker-compose up --build -d
 ```
 
-4. To stop the application:
+### Stopping the Application
 
 ```bash
 docker-compose down
@@ -45,7 +57,17 @@ docker-compose down
 
 ## Development
 
-The application code is mounted as a volume in the Docker container, so any changes you make to the code will be reflected immediately without having to rebuild the container.
+The application code is mounted as a volume in the Docker container when running in development mode, so any changes you make to the code will be reflected immediately without having to rebuild the container.
+
+### Key Differences Between Environments
+
+| Feature | Development | Production |
+|---------|-------------|------------|
+| Web Server | Flask Development Server | Gunicorn |
+| Debug Mode | Enabled | Disabled |
+| Hot Reloading | Enabled | Disabled |
+| Volume Mounts | Read-Write | Read-Only |
+| Container Restart | No | Always |
 
 ## API Endpoints
 
